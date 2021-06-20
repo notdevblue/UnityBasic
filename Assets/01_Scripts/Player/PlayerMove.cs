@@ -12,9 +12,12 @@ public class PlayerMove : MonoBehaviour
     private bool            isDash          = false;
     private int             jumpCount       = 2;
     private int             curJumpCount    = 0;
+    private float           xMove;
+
 
     [SerializeField] private float playerSpeed  = 5.0f;
     [SerializeField] private float jumpForce    = 30.0f;
+    [SerializeField] private float dashForce    = 10.0f;
 
     [Header("Ground Check")]
     [SerializeField] private Transform   groundChecker;
@@ -51,6 +54,7 @@ public class PlayerMove : MonoBehaviour
         }
         if(input.isDash)
         {
+            Debug.Log("Pressed");
             isDash = true;
         }
     }
@@ -60,15 +64,16 @@ public class PlayerMove : MonoBehaviour
         Move();
         CheckGround();
         Jump();
+        Dash();
     }
 
     private void Move()
     {
-        float xMove = input.xMove;
+        xMove = input.xMove;
         
         if (xMove > 0)      spriteRenderer.flipX = false;
         else if (xMove < 0) spriteRenderer.flipX = true;
-
+        //rigid.AddForce(new Vector2(xMove * playerSpeed, rigid.velocity.y), ForceMode2D.Impulse);
         rigid.velocity = new Vector2(xMove * playerSpeed, rigid.velocity.y);
     }
 
@@ -84,21 +89,32 @@ public class PlayerMove : MonoBehaviour
 
     private void Jump()
     {
+        if(isGround && rigid.velocity.y < 0.1f)
+        {
+            playerAnimation.JumpEnd(); // 점핑에니메이션 끝
+        }
         if (!isJump) return;
         if (!isGround && curJumpCount <= 0) { isJump = false; return; }
 
         --curJumpCount;
         rigid.velocity = Vector2.zero;
-        playerAnimation.Jump(); // 점프 에니메이션 재상
+        playerAnimation.Jump(); // 점프 에니메이션 재생
 
-        rigid.AddForce(new Vector2(rigid.velocity.x, jumpForce), ForceMode2D.Impulse);
+        rigid.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
         isJump = false;
-
-
-        if(isGround && rigid.velocity.y < 0.1f)
-        {
-            playerAnimation.JumpEnd(); // 점핑에니메이션 끝
-        }
     }
 
+
+    private void Dash()
+    {
+        if (Mathf.Abs(rigid.velocity.x) <= playerSpeed)
+        {
+            playerAnimation.DashEnd();
+        }
+        if (!isDash) { return; }
+
+        playerAnimation.Dash();
+        rigid.AddForce(new Vector2(xMove * dashForce, 0), ForceMode2D.Impulse);
+        isDash = false;
+    }
 }

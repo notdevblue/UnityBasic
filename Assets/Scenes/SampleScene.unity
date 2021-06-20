@@ -290,6 +290,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerSpeed: 5
   jumpForce: 10
+  dashForce: 60
   groundChecker: {fileID: 786740295}
   whatIsGround:
     serializedVersion: 2

@@ -14,6 +14,7 @@ public class PlayerAnimation : MonoBehaviour
     private readonly int hashYSpeed     = Animator.StringToHash("ySpeed");
     private readonly int hashIsGround   = Animator.StringToHash("isGround");
     private readonly int hashIsJumping  = Animator.StringToHash("isJumping");
+    private readonly int hashIsDashing  = Animator.StringToHash("isDashing");
     private readonly int hashDoubleJump = Animator.StringToHash("DoubleJump");
 
 
@@ -67,6 +68,16 @@ public class PlayerAnimation : MonoBehaviour
     {
         jumping = false;
         anim.SetBool(hashIsJumping, false);
+    }
+
+    public void Dash()
+    {
+        anim.SetBool(hashIsDashing, true);
+    }
+
+    public void DashEnd()
+    {
+        anim.SetBool(hashIsDashing, false);
     }
 }
 

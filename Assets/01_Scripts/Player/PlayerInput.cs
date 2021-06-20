@@ -15,7 +15,8 @@ public class PlayerInput : MonoBehaviour
     {
         xMove   = Input.GetAxisRaw("Horizontal");
         isJump  = Input.GetButtonDown("Jump");
-        isDash  = Input.GetButtonDown("Dash");
+        //isDash  = Input.GetButtonDown("Dash");
+        isDash = Input.GetKeyDown(KeyCode.LeftShift);
     }
 
 }
