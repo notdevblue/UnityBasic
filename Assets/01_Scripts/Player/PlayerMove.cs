@@ -10,14 +10,18 @@ public class PlayerMove : MonoBehaviour
     private PlayerAnimation playerAnimation;
     private bool            isJump          = false;
     private bool            isDash          = false;
+    private bool            dashing         = false;
     private int             jumpCount       = 2;
     private int             curJumpCount    = 0;
     private float           xMove;
 
 
-    [SerializeField] private float playerSpeed  = 5.0f;
-    [SerializeField] private float jumpForce    = 30.0f;
-    [SerializeField] private float dashForce    = 10.0f;
+    [SerializeField] private float playerSpeed       = 5.0f;
+    [SerializeField] private float jumpForce         = 30.0f;
+    [SerializeField] private float dashForce         = 10.0f;
+    [SerializeField] private ParticleSystem playerDashEffect = null;
+                     private float dashForceOrigin   = 10.0f;
+                     private float playerSpeedOrigin = 10.0f;
 
     [Header("Ground Check")]
     [SerializeField] private Transform   groundChecker;
@@ -39,7 +43,10 @@ public class PlayerMove : MonoBehaviour
     private void Start()
     {
         curJumpCount = jumpCount;
+        dashForceOrigin = dashForce;
+        playerSpeedOrigin = playerSpeed;
     }
+
 
     private void Update()
     {
@@ -71,8 +78,8 @@ public class PlayerMove : MonoBehaviour
     {
         xMove = input.xMove;
         
-        if (xMove > 0)      spriteRenderer.flipX = false;
-        else if (xMove < 0) spriteRenderer.flipX = true;
+        if (xMove > 0)      { spriteRenderer.flipX = false; }
+        else if (xMove < 0) { spriteRenderer.flipX = true; }
         //rigid.AddForce(new Vector2(xMove * playerSpeed, rigid.velocity.y), ForceMode2D.Impulse);
         rigid.velocity = new Vector2(xMove * playerSpeed, rigid.velocity.y);
     }
@@ -107,14 +114,24 @@ public class PlayerMove : MonoBehaviour
 
     private void Dash()
     {
-        if (Mathf.Abs(rigid.velocity.x) <= playerSpeed)
+        if (dashForce <= 0.01f)
         {
             playerAnimation.DashEnd();
+            dashForce = dashForceOrigin;
+            playerSpeed = playerSpeedOrigin;
+            dashing = false;
         }
-        if (!isDash) { return; }
+        if (!isDash && !dashing) { return; }
+        
+        if(!dashing && isDash) { playerDashEffect.GetComponent<ParticleSystemRenderer>().flip = new Vector3(spriteRenderer.flipX ? 1 : 0, 0); playerDashEffect.Play(); }
 
+        dashing = true;
         playerAnimation.Dash();
-        rigid.AddForce(new Vector2(xMove * dashForce, 0), ForceMode2D.Impulse);
+        
+        playerSpeed = playerSpeedOrigin + (dashForce /= 1.5f);
+        
+        
+        //rigid.AddForce(new Vector2(xMove * dashForce, rigid.velocity.y), ForceMode2D.Impulse);
         isDash = false;
     }
 }
