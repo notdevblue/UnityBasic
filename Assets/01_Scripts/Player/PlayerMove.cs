@@ -9,19 +9,24 @@ public class PlayerMove : MonoBehaviour
     private SpriteRenderer  spriteRenderer;
     private PlayerAnimation playerAnimation;
     private bool            isJump          = false;
-    private bool            isDash          = false;
-    private bool            dashing         = false;
     private int             jumpCount       = 2;
     private int             curJumpCount    = 0;
     private float           xMove;
 
 
-    [SerializeField] private float playerSpeed       = 5.0f;
-    [SerializeField] private float jumpForce         = 30.0f;
-    [SerializeField] private float dashForce         = 10.0f;
-    [SerializeField] private ParticleSystem playerDashEffect = null;
-                     private float dashForceOrigin   = 10.0f;
-                     private float playerSpeedOrigin = 10.0f;
+    [SerializeField] private float          playerSpeed       = 5.0f;
+    [SerializeField] private float          jumpForce         = 30.0f;
+    
+    
+    
+    [Header("대시 관련")]
+    [SerializeField] private GameObject     afterImagePrefab  = null;
+    [SerializeField] private Transform      afterImageTrm;
+    [SerializeField] private float          dashForce         = 10.0f;
+    [SerializeField] private float          dashTime          = 0.2f;
+                     private bool           isDash            = false;
+    [SerializeField] private int            dashCount         = 1; // TODO : 숙제
+                     private int            curDashCount      = 1;
 
     [Header("Ground Check")]
     [SerializeField] private Transform   groundChecker;
@@ -38,13 +43,14 @@ public class PlayerMove : MonoBehaviour
         input           = GetComponent<PlayerInput>();
         spriteRenderer  = GetComponent<SpriteRenderer>();
         playerAnimation = GetComponent<PlayerAnimation>();
+
+        PoolManager.CreatePool<AfterImage>(afterImagePrefab, afterImageTrm, 20);
     }
 
     private void Start()
     {
         curJumpCount = jumpCount;
-        dashForceOrigin = dashForce;
-        playerSpeedOrigin = playerSpeed;
+        curDashCount = dashCount;
     }
 
 
@@ -59,10 +65,11 @@ public class PlayerMove : MonoBehaviour
         {
             isJump = true;
         }
-        if(input.isDash)
+        if(input.isDash && !isDash && curDashCount > 0)
         {
-            Debug.Log("Pressed");
+            Debug.Log("대씨");
             isDash = true;
+            StartCoroutine(Dash());
         }
     }
 
@@ -76,11 +83,12 @@ public class PlayerMove : MonoBehaviour
 
     private void Move()
     {
+        if(isDash) { return; }
+
         xMove = input.xMove;
         
         if (xMove > 0)      { spriteRenderer.flipX = false; }
         else if (xMove < 0) { spriteRenderer.flipX = true; }
-        //rigid.AddForce(new Vector2(xMove * playerSpeed, rigid.velocity.y), ForceMode2D.Impulse);
         rigid.velocity = new Vector2(xMove * playerSpeed, rigid.velocity.y);
     }
 
@@ -91,12 +99,15 @@ public class PlayerMove : MonoBehaviour
         if(isGround)
         {
             curJumpCount = jumpCount;
+            curDashCount = dashCount;
         }
     }
 
     private void Jump()
     {
-        if(isGround && rigid.velocity.y < 0.1f)
+        if(isDash) { return; }
+
+        if (isGround && rigid.velocity.y < 0.1f)
         {
             playerAnimation.JumpEnd(); // 점핑에니메이션 끝
         }
@@ -112,26 +123,41 @@ public class PlayerMove : MonoBehaviour
     }
 
 
-    private void Dash()
+    private IEnumerator Dash()
     {
-        if (dashForce <= 0.01f)
-        {
-            playerAnimation.DashEnd();
-            dashForce = dashForceOrigin;
-            playerSpeed = playerSpeedOrigin;
-            dashing = false;
-        }
-        if (!isDash && !dashing) { return; }
-        
-        if(!dashing && isDash) { playerDashEffect.GetComponent<ParticleSystemRenderer>().flip = new Vector3(spriteRenderer.flipX ? 1 : 0, 0); playerDashEffect.Play(); }
+        --curDashCount;
 
-        dashing = true;
-        playerAnimation.Dash();
-        
-        playerSpeed = playerSpeedOrigin + (dashForce /= 1.5f);
-        
-        
-        //rigid.AddForce(new Vector2(xMove * dashForce, rigid.velocity.y), ForceMode2D.Impulse);
-        isDash = false;
+        float time       = 0;
+        float afterTime  = 0;
+        float targetTime = Random.Range(0.01f, 0.07f);
+
+        Vector2 dir = spriteRenderer.flipX ? transform.right * -1 : transform.right;
+        rigid.velocity = Vector2.zero;
+        rigid.AddForce(dir * dashForce, ForceMode2D.Impulse);
+        rigid.gravityScale = 0;
+
+
+        while(isDash)
+        {
+            time      += Time.deltaTime;
+            afterTime += Time.deltaTime;
+
+            if(afterTime >= targetTime)
+            {
+                AfterImage ai = PoolManager.GetItem<AfterImage>();
+                ai.SetSprite(spriteRenderer.sprite, spriteRenderer.flipX, transform.position);
+                targetTime = Random.Range(0.01f, 0.07f);
+                afterTime = 0;
+            }
+
+            if(time >= dashTime)
+            {
+                isDash = false;
+            }
+
+            yield return null;
+        }
+        rigid.velocity = Vector2.zero;
+        rigid.gravityScale = 1;
     }
 }

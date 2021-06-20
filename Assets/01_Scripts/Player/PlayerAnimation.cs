@@ -16,6 +16,7 @@ public class PlayerAnimation : MonoBehaviour
     private readonly int hashIsJumping  = Animator.StringToHash("isJumping");
     private readonly int hashIsDashing  = Animator.StringToHash("isDashing");
     private readonly int hashDoubleJump = Animator.StringToHash("DoubleJump");
+    private readonly int hashAttack     = Animator.StringToHash("Attack");
 
 
     //// Hash
@@ -78,6 +79,11 @@ public class PlayerAnimation : MonoBehaviour
     public void DashEnd()
     {
         anim.SetBool(hashIsDashing, false);
+    }
+
+    public void StartAttack()
+    {
+        anim.SetTrigger(hashAttack);
     }
 }
 
