@@ -8,6 +8,8 @@ public class PoolManager
     public static Dictionary<string, object> pool = new Dictionary<string, object>();
     public static Dictionary<string, GameObject> prefabDictionary = new Dictionary<string, GameObject>();
 
+    
+
     public static void CreatePool<T>(GameObject prefab, Transform parent, int count =  5)
     {
         Queue<T> queue = new Queue<T>();
