@@ -107,11 +107,12 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets\01_Scripts\Player\PlayerMove.cs" />
+    <Compile Include="Assets\01_Scripts\TMP\WaveText.cs" />
     <Compile Include="Assets\01_Scripts\Player\PlayerAttack.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\01_Scripts\ETC\MyGizmos.cs" />
-    <Compile Include="Assets\01_Scripts\TMP\WaveText.cs" />
+    <Compile Include="Assets\01_Scripts\TMP\TextEffects.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
