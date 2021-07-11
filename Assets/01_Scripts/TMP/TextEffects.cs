@@ -106,7 +106,7 @@ public class TextEffects : MonoBehaviour
 
         main.DOColor(new Color32(250, 164, 126, 255), 8.7f);
 
-        tmpText.text = "¿¢";
+        tmpText.text = "ÀÍ";
         yield return new WaitForSeconds(0.284f);
 
 
@@ -167,8 +167,8 @@ public class TextEffects : MonoBehaviour
             if (mul > 20.0f)
                 mul = 20.0f;
 
-            int x = (int)((Mathf.Sin(Time.time * (mul / 3.0f)) * mul * 10.0f) * Time.deltaTime * 100.0f);
-            int y = (int)((Mathf.Cos(Time.time * (mul / 3.0f)) * mul * 10.0f) * Time.deltaTime * 100.0f);
+            int x = (int)((Mathf.Sin(Time.time * (mul / 5.0f)) * mul * 10.0f)/* * Time.deltaTime * 100.0f*/);
+            int y = (int)((Mathf.Cos(Time.time * (mul / 5.0f)) * mul * 10.0f)/* * Time.deltaTime * 100.0f*/);
             SetLocation(mid.x + x, mid.y + y);
             yield return new WaitForEndOfFrame();
         }

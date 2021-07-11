@@ -14,11 +14,22 @@ public class PlayerInput : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.TimeScale <= 0)
+        {
+            xMove = 0;
+            isJump = false;
+            isDash = false;
+            isAttack = false;
+            return;
+        }
+
+
         xMove    = Input.GetAxisRaw("Horizontal");
         isJump   = Input.GetButtonDown("Jump");
         //isDash = Input.GetButtonDown("Dash");
         isDash   = Input.GetKeyDown(KeyCode.LeftShift);
         isAttack = Input.GetButtonDown("Fire1");
+
     }
 
 }
